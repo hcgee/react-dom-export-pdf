@@ -1,0 +1,16 @@
+{
+  "name": "react-dom-export-pdf",
+  "version": "1.0.1",
+  "description": "导出pdf",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "evanhhc",
+  "license": "ISC",
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1"
+  }
+}
