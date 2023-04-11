@@ -10,7 +10,7 @@ const a4Size = {
 };
 
 // 左右边距
-const plr = 56;
+const plr = 50;
 
 /**
  * dom转为img
@@ -45,8 +45,43 @@ const generateImg = async (dom, options = {}) => {
   };
 };
 
+const addBlankNode = (header, content, footer) => {
+  const contentWidth = content.offsetWidth
+  // 如果有子节点
+  if (content.children.length > 0) {
+    let children_height = header.offsetHeight * (a4Size.w / contentWidth) + footer.offsetHeight * (a4Size.w / contentWidth)
+    for (let i = 0; i < content.children.length; i++) {
+      const element = content.children[i];
+      const height = element.offsetHeight + parseFloat(getComputedStyle(element).marginTop) + parseFloat(getComputedStyle(element).marginBottom);
+      const eleHeight = height * (a4Size.w / contentWidth)
+      children_height += eleHeight
+
+      if (children_height > a4Size.h) {
+        console.log('超出了==>', element);
+        // 添加留白
+        // let addHeight = a4Size.h - children_height + eleHeight
+        let addHeight = (a4Size.h - children_height + eleHeight) * (contentWidth / a4Size.w)
+        console.log('留白高度', addHeight);
+        let addNode = function () {
+          let node = document.createElement('div')
+          node.style.width = '100%'
+          node.style.height = addHeight + 'px'
+          return node
+        }
+        element.parentNode.insertBefore(addNode(), element)
+        children_height = header.offsetHeight * (a4Size.w / contentWidth) + footer.offsetHeight * (a4Size.w / contentWidth)
+      }
+      console.log(`子节点的高度${eleHeight},总和${children_height},当前节点`, element);
+    }
+
+  }
+  return content
+}
+
 // img转为PDF
-const generatePdf = async ({ header, content, footer, pdfFileName = "pdf" }) => {
+const generatePdf = async ({ header, content, footer, fileName = "pdf" }) => {
+  // 截断问题 添加留白
+  content = addBlankNode(header,content,footer)
   // 生成三张图片， 页眉 内容 页尾
   const { img: headerImg, imgSize: headerImgSize } = await generateImg(
     header,
@@ -99,7 +134,7 @@ const generatePdf = async ({ header, content, footer, pdfFileName = "pdf" }) => 
       PDF.addPage();
     }
   }
-  PDF.save(`${pdfFileName}.pdf`);
+  PDF.save(`${fileName}.pdf`);
 };
 
 
